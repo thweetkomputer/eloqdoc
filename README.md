@@ -1,3 +1,19 @@
+<div align="center">
+<a href='https://www.eloqdata.com'>
+<img src="images/eloqdoc_github_logov1.jpg" alt="EloqDoc" height=150></img>
+</a>
+  
+---
+
+[![License](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://github.com/eloqdata/eloqdoc/blob/readme/LICENSE)
+[![Language](https://img.shields.io/badge/language-C++-orange)](https://isocpp.org/)
+[![GitHub issues](https://img.shields.io/github/issues/eloqdata/eloqdoc)](https://github.com/eloqdata/eloqdoc/issues)
+[![Release](https://img.shields.io/badge/release-latest-blue)](https://www.eloqdata.com/download)
+<a href="https://discord.com/invite/nmYjBkfak6">
+  <img alt="EloqDoc" src="https://img.shields.io/badge/discord-blue.svg?logo=discord&logoColor=white">
+</a>
+</div>
+
 # EloqDoc
 
 A MongoDB API compatible , high-performance, elastic, distributed document database.
@@ -8,13 +24,15 @@ A MongoDB API compatible , high-performance, elastic, distributed document datab
 
 ## Overview
 
-EloqDoc is a high-performance, elastic, distributed transactional document database with MongoDB API compability. Built on top of [Data Substrate](https://www.eloqdata.com/blog/2024/08/11/data-substrate), it leverages a decoupled storage and compute architecture to deliver fast scaling, ACID transaction support, and efficient resource utilization.
+EloqDoc is a high-performance, distributed transactional document database with MongoDB API compatibility. Its breakthrough architecture, powered by [Data Substrate](https://www.eloqdata.com/blog/2024/08/11/data-substrate), redefines the balance between cost, scalability, and performance for real-world document workloads.
 
-EloqDoc eliminates the need for sharding components like `mongos` in MongoDB, offering a simpler, more powerful distributed database experience. It’s ideal for workloads requiring rapid scaling, high write throughput, and flexible resource management.
+Unlike MongoDB, which relies on three replica-set nodes for durability, EloqDoc treats cloud object storage as a first-class citizen. Durable, cross–availability zone (AZ) object storage serves as the persistent foundation, while local NVMe caching accelerates reads. Recent updates are written to a decoupled redo log component. This architecture minimizes write latency while maintaining strong consistency and durability.
 
-Explore [EloqDoc](https://www.eloqdata.com/product/eloqdoc) website for more details.
+The result is a cloud-native, storage-centric deployment model: EloqDoc typically runs a single compute replica with storage-level high availability, orchestrated by Kubernetes for automatic failover. This approach cuts infrastructure costs, avoids redundant CPU and memory overhead, and delivers higher throughput across mixed read/write workloads.
 
-👉 **Use Cases**: web applications, ducument store, content management systems — anywhere you need MongoDB API compatibility **but** demand distributed performance and elasticity.
+Explore [EloqDoc](https://www.eloqdata.com/product/eloqdoc) for more details, or skip ahead to the Key Features section for a deeper breakdown. You can also experience the managed cloud version at [EloqCloud](https://cloud.eloqdata.com).
+
+👉 **Use Cases**: web applications, document stores, content platforms—anywhere you need MongoDB API compatibility **and** expect distributed performance and elasticity.
 
 ---
 
@@ -24,14 +42,18 @@ Explore [EloqDoc](https://www.eloqdata.com/product/eloqdoc) website for more det
 
 Seamlessly integrates with MongoDB clients, drivers, and tools, enabling you to use existing MongoDB workflows with a distributed backend.
 
-### 🌐 Distributed Architecture
+### 🗃️ Tiered Storage Architecture
+
+EloqDoc seamlessly manages hot and cold data across **memory, local NVMe cache, and object storage**. Since NVMe storage is ephemeral and lost when a node crashes, EloqDoc uses it strictly as a cache for object storage. This design ensures that all data remains safe and durable in cross-AZ object storage while still benefiting from NVMe-level performance for frequently accessed data.
+
+### 🌐 Truely Distributed Database
 
 Supports **multiple writers** and **fast distributed transactions**, ensuring high concurrency and fault tolerance across a cluster without sharding complexity.
 
 ### 🔄 Elastic Scalability
 
 - Scales compute and memory **100x faster** than traditional databases by avoiding data movement on disk.
-- Scales storage independently, conserving CPU resources for compute-intensive tasks.
+- Scales storage independently, so CPU resources remain constant when data volume grows but traffic stays the same.
 - Scales redo logs independently to optimize write throughput.
 
 ### 🔥 High-Performance Transactions
@@ -44,13 +66,66 @@ Operates as a distributed database without requiring a sharding coordinator (e.g
 
 ---
 
-## Architecture Highlights
+## Architecture
 
+<div align="center">
+<a href='https://www.eloqdata.com'>
+<img src="images/eloqdocarchitecture.jpg" alt="EloqDoc Arch" width=600></img>
+</a>
+</div>
+
+EloqDoc is a decoupled, distributed database built on [Data Substrate](https://www.eloqdata.com/blog/2025/07/14/technology), the innovative new database foundation developed by EloqData.
+
+Each EloqDoc instance includes a frontend, compatible with the MongoDB protocol, deployed together with the core TxService to handle data operations. A logically independent LogService handles Write Ahead Logging (WAL) to ensure persistence, while a Storage Service manages memory state checkpoints and cold data storage.
+
+This architecture enable EloqDoc to support:
 - **Fast Scaling**: Compute and memory scale independently without disk data movement, enabling rapid elasticity for dynamic workloads.
 - **Storage Flexibility**: Storage scales separately from compute, optimizing resource allocation and reducing waste.
 - **Write Optimization**: Independent redo log scaling boosts write throughput, ideal for high-velocity data ingestion.
 - **No Sharding Overhead**: Distributes data natively across the cluster, eliminating the need for additional sharding components.
 
+---
+
+## Benchmark
+
+We evaluated EloqDoc against MongoDB Atlas across representative deployment scenarios, ranging from fully in-memory workloads to cases where the working set does not fit in cache. All tests were executed on 16-core database nodes configured with identical client concurrency and dataset characteristics.
+
+**Key takeaways**
+- EloqDoc sustained up to 60% higher throughput than MongoDB Atlas for mixed 1:1 read/write workloads when the active dataset was fully cached.
+- For read-heavy applications, EloqDoc delivered roughly 60% higher peak throughput while maintaining lower latency across the entire concurrency range.
+- When the workload required frequent disk accesses, EloqDoc’s local NVMe cache + object storage design preserved performance and availability, whereas Atlas’s EBS-backed tier became IO-bound.
+
+### Fully Cached Results
+
+**Mixed read/write (1:1)** – EloqDoc maintained higher throughput under heavy contention and peaked at roughly 60% more operations per second than Atlas.
+
+<div align="center">
+<a href='https://www.eloqdata.com'>
+<img src="images/eloqdocatlasfull16crw.jpg" alt="EloqDoc vs. Atlas, 16-core mixed workload" width=500></img>
+</a>
+</div>
+
+**Read-only** – EloqDoc achieved high throughput even at moderate concurrency, sustaining about 60% higher throughput compared with Atlas.
+
+<div align="center">
+<a href='https://www.eloqdata.com'>
+<img src="images/eloqdocatlasfull16cro.jpg" alt="EloqDoc vs. Atlas, 16-core read-only workload" width=500></img>
+</a>
+</div>
+
+### Low Cache Hit Rate Results
+
+For datasets that exceed available memory, we configured both systems to serve 150 million documents, forcing regular cache misses. EloqDoc leverages local NVMe as a write-back cache layered over durable object storage. This architecture delivered hundreds of thousands of IOPS while keeping data fully resilient. In contrast, the Atlas deployment backed by network EBS volumes saturated its IO budget, leading to noticeably lower throughput and higher tail latency.
+
+<div align="center">
+<a href='https://www.eloqdata.com'>
+<img src="images/eloqdocatlas16c150mro.jpg" alt="EloqDoc vs. Atlas, 16-core low cache hit workload" width=500></img>
+</a>
+</div>
+
+We will publish a more detailed benchmarks in future.
+
+  
 ---
 
 ## Quick Start

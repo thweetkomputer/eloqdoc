@@ -11,10 +11,10 @@ git clone --recurse-submodules https://github.com/eloqdata/eloqdoc
 Assuming Ubuntu 24.04 is your development environment, run the following script to install dependencies.
 
 ```bash
-bash scripts/install_dependency-ubuntu2404.sh
+bash scripts/install_dependency_ubuntu2404.sh
 ```
 
-If you are using another Linux distribution, follow the steps in `install_dependency-ubuntu2404.sh` to install dependencies manually.
+If you are using another Linux distribution, follow the steps in `install_dependency_ubuntu2404.sh` to install dependencies manually.
 
 ## 1. Compile EloqDoc-RocksDB
 

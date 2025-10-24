@@ -171,7 +171,6 @@ if [ "$SKIP_ELOQ_COMMON" = false ]; then
     sudo cmake --build cmake-out --target install -- -j $(nproc) && \
     sudo ldconfig 
 
-
     # ------------- Protobuf installation -------------
     # Compile protobuf from source code. Protobuf version needs to be compatible
     # with both brpc and grpc. It cannot be too high or too low.
@@ -189,31 +188,6 @@ if [ "$SKIP_ELOQ_COMMON" = false ]; then
     -Dprotobuf_BUILD_TESTS=OFF \
     -Dprotobuf_ABSL_PROVIDER=package \
     -S . -B cmake-out && \
-    cmake --build cmake-out -- -j $COMPILE_JOBS && \
-    sudo cmake --build cmake-out --target install -- -j $COMPILE_JOBS && \
-    sudo ldconfig
-
-    # ------------- grpc installation -------------
-    log_info "Installing grpc"
-    cd $TEMP_DIR
-    if [ ! -d "grpc" ]; then
-        mkdir -p grpc
-    fi
-    cd grpc
-    curl -fsSL https://codeload.github.com/grpc/grpc/tar.gz/refs/tags/v1.51.1 | \
-    tar -xzf - --strip-components=1 && \
-    cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_SHARED_LIBS=yes \
-        -DgRPC_INSTALL=ON \
-        -DgRPC_BUILD_TESTS=OFF \
-        -DgRPC_ABSL_PROVIDER=package \
-        -DgRPC_CARES_PROVIDER=package \
-        -DgRPC_PROTOBUF_PROVIDER=package \
-        -DgRPC_RE2_PROVIDER=package \
-        -DgRPC_SSL_PROVIDER=package \
-        -DgRPC_ZLIB_PROVIDER=package \
-        -S . -B cmake-out && \
     cmake --build cmake-out -- -j $COMPILE_JOBS && \
     sudo cmake --build cmake-out --target install -- -j $COMPILE_JOBS && \
     sudo ldconfig
@@ -302,28 +276,6 @@ if [ "$SKIP_ELOQ_COMMON" = false ]; then
     sudo cp -r ./output/include/* /usr/include/ && \
     sudo cp -r ./output/lib/* /usr/lib/ 
 
-
-    # compile bigtable cpp client libraries
-    # Pick a location to install the artifacts, e.g., `/usr/local` or `/opt`
-    log_info "Install google-cloud-cpp for bigtable"
-    cd $TEMP_DIR
-    if [ ! -d "google-cloud-cpp" ]; then
-        mkdir -p google-cloud-cpp
-    fi
-    cd google-cloud-cpp
-    curl -fsSL https://codeload.github.com/googleapis/google-cloud-cpp/tar.gz/refs/tags/v2.24.0 | \
-    tar -xzf - --strip-components=1 && \
-    cmake -S . -B cmake-out \
-    -DCMAKE_INSTALL_PREFIX="/usr/local" \
-    -DBUILD_TESTING=OFF \
-    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-    -DGOOGLE_CLOUD_CPP_ENABLE_EXAMPLES=OFF \
-    -DGOOGLE_CLOUD_CPP_ENABLE=bigtable,storage && \
-    cmake --build cmake-out -- -j "$(nproc)" && \
-    sudo cmake --build cmake-out --target install && \
-    cd ../ 
-
-
     # ------------- RocksDB installation -------------
     log_info "Installing RocksDB"
     cd $TEMP_DIR
@@ -348,11 +300,6 @@ if [ "$SKIP_ELOQ_COMMON" = false ]; then
     sudo mkdir -p /usr/local/include/rocksdb_cloud_header && \
     sudo cp -r ./output/include/* /usr/local/include/rocksdb_cloud_header && \
     sudo cp -r ./output/lib/* /usr/local/lib && \
-    make clean && rm -rf `pwd`/output && \
-    LIBNAME=librocksdb-cloud-gcp USE_RTTI=1 USE_GCP=1 ROCKSDB_DISABLE_TCMALLOC=1 ROCKSDB_DISABLE_JEMALLOC=1 make shared_lib -j8 && \
-    LIBNAME=librocksdb-cloud-gcp PREFIX=`pwd`/output make install-shared && \
-    sudo cp -r ./output/lib/* /usr/local/lib && \
-    cd ../ && \
     sudo ldconfig
 
     # ------------- Prometheus CPP installation -------------

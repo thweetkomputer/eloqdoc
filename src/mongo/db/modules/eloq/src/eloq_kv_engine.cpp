@@ -254,6 +254,9 @@ static void configureEloqStore(EloqDS::EloqStoreConfig& eloq_store_config,
 
     eloq_store_config.eloqstore_configs_.data_append_mode =
         eloqGlobalOptions.eloqStoreDataAppendMode;
+
+    eloq_store_config.eloqstore_configs_.enable_compression =
+        eloqGlobalOptions.eloqStoreEnableCompression;
 }
 #endif
 

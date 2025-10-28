@@ -583,6 +583,12 @@ Status EloqGlobalOptions::add(moe::OptionSection* options) {
                            moe::Bool,
                            "EloqStore data append mode")
         .setDefault(moe::Value(false));
+    eloqOptions
+        .addOptionChaining("storage.eloq.storage.eloqStoreEnableCompression",
+                       "eloqEloqStoreEnableCompression",
+                       moe::Bool,
+                       "EloqStore enable compression")
+        .setDefault(moe::Value(false));
 
     // Options for metrics
     eloqOptions
@@ -1078,6 +1084,10 @@ Status EloqGlobalOptions::store(const moe::Environment& params,
     if (params.count("storage.eloq.storage.eloqStoreDataAppendMode")) {
         eloqGlobalOptions.eloqStoreDataAppendMode =
             params["storage.eloq.storage.eloqStoreDataAppendMode"].as<bool>();
+    }
+    if (params.count("storage.eloq.storage.eloqStoreEnableCompression")) {
+        eloqGlobalOptions.eloqStoreEnableCompression =
+            params["storage.eloq.storage.eloqStoreEnableCompression"].as<bool>();
     }
 
     // Parse metrics options

@@ -146,6 +146,7 @@ public:
     uint32_t eloqStorePagesPerFileShift{11};
     uint32_t eloqStoreOverflowPointers{16};
     bool eloqStoreDataAppendMode{false};
+    bool eloqStoreEnableCompression{false};
 
     // metrics
     bool enableMetrics{false};

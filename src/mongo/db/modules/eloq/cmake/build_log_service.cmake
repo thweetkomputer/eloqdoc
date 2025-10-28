@@ -144,7 +144,6 @@ message("TX_LOG_PROTOS_SOURCE_DIR:${TX_LOG_PROTOS_SOURCE_DIR} ; LOG_INCLUDE_DIR:
 add_library(LOG_SERVICE_OBJ OBJECT
     ${LOG_SOURCE_DIR}/src/log_server.cpp
     ${LOG_SOURCE_DIR}/src/log_state_rocksdb_impl.cpp
-    ${LOG_SOURCE_DIR}/src/log_state_rocksdb_cloud_impl.cpp
     ${LOG_SOURCE_DIR}/src/open_log_service.cpp
     ${LOG_SOURCE_DIR}/src/open_log_task.cpp
     ${LOG_SOURCE_DIR}/src/fault_inject.cpp

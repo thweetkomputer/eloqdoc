@@ -103,7 +103,7 @@ pyenv global 2.7.18
 Compile EloqDoc from the repository root.
 
 ```bash
-env WITH_LOG_STATE=ROCKSDB_CLOUD_S3 WITH_DATA_STORE=ELOQDSS_ROCKSDB_CLOUD_S3 \
+env WITH_DATA_STORE=ELOQDSS_ROCKSDB_CLOUD_S3 \
 python scripts/buildscripts/scons.py \
     MONGO_VERSION=4.0.3 \
     VARIANT_DIR=RelWithDebInfo \

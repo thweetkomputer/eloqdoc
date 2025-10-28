@@ -33,6 +33,7 @@
 #include "mongo/util/assert_util.h"
 #include "mongo/util/log.h"
 
+#include "log_utils.h"
 #include "mongo/db/modules/eloq/eloq_metrics/include/metrics.h"
 #include "mongo/db/modules/eloq/src/base/eloq_key.h"
 #include "mongo/db/modules/eloq/src/base/eloq_log_agent.h"

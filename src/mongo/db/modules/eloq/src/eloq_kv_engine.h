@@ -18,6 +18,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "mongo/db/storage/kv/kv_engine.h"
@@ -33,6 +34,7 @@
 #include "mongo/db/modules/eloq/eloq_log_service/include/log_server.h"
 #include "mongo/db/modules/eloq/eloq_log_service/include/log_utils.h"
 #endif
+#include "mongo/db/modules/eloq/tx_service/include/sharder.h"
 #include "mongo/db/modules/eloq/tx_service/include/tx_service.h"
 
 namespace mongo {
@@ -59,7 +61,11 @@ class EloqKVEngine final : public KVEngine {
 
 public:
     explicit EloqKVEngine(const std::string& path);
-    void initDataStoreService();
+    void initDataStoreService(
+        bool isSingleNode,
+        uint32_t nodeId,
+        uint32_t nativeNgId,
+        const std::unordered_map<uint32_t, std::vector<txservice::NodeConfig>>& ng_configs);
 
     ~EloqKVEngine() override;
 

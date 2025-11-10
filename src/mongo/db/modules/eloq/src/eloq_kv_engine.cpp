@@ -197,10 +197,6 @@ static void configureEloqStore(EloqDS::EloqStoreConfig& eloq_store_config,
     eloq_store_config.eloqstore_configs_.skip_verify_checksum =
         eloqGlobalOptions.eloqStoreSkipVerifyChecksum;
 
-    eloq_store_config.eloqstore_configs_.index_buffer_pool_size =
-        eloqGlobalOptions.eloqStoreIndexBufferPoolSize /
-        eloq_store_config.eloqstore_configs_.num_threads;
-
     eloq_store_config.eloqstore_configs_.manifest_limit = eloqGlobalOptions.eloqStoreManifestLimit;
 
     eloq_store_config.eloqstore_configs_.io_queue_size =
@@ -230,10 +226,6 @@ static void configureEloqStore(EloqDS::EloqStoreConfig& eloq_store_config,
     eloq_store_config.eloqstore_configs_.file_amplify_factor =
         eloqGlobalOptions.eloqStoreFileAmplifyFactor;
 
-    eloq_store_config.eloqstore_configs_.local_space_limit =
-        txlog::parse_size(eloqGlobalOptions.eloqStoreLocalSpaceLimit) /
-        eloq_store_config.eloqstore_configs_.num_threads;
-
     eloq_store_config.eloqstore_configs_.reserve_space_ratio =
         eloqGlobalOptions.eloqStoreReserveSpaceRatio;
 
@@ -247,6 +239,16 @@ static void configureEloqStore(EloqDS::EloqStoreConfig& eloq_store_config,
 
     eloq_store_config.eloqstore_configs_.data_append_mode =
         eloqGlobalOptions.eloqStoreDataAppendMode;
+
+    eloq_store_config.eloqstore_configs_.local_space_limit =
+        txlog::parse_size(eloqGlobalOptions.eloqStoreLocalSpaceLimit);
+
+    eloq_store_config.eloqstore_configs_.index_buffer_pool_size =
+        txlog::parse_size(eloqGlobalOptions.eloqStoreIndexBufferPoolSize) /
+        eloq_store_config.eloqstore_configs_.num_threads;
+
+    eloq_store_config.eloqstore_configs_.enable_compression =
+        eloqGlobalOptions.eloqStoreEnableCompression;
 }
 #endif
 

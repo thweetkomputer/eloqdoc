@@ -332,6 +332,24 @@ if [ "$SKIP_ELOQ_COMMON" = false ]; then
     cd cuckoofilter && \
     sudo make install
 
+    # ------------- Google Cloud CPP installation -------------
+    cd $TEMP_DIR
+    if [ ! -d "google-cloud-cpp" ]; then
+        mkdir google-cloud-cpp && cd google-cloud-cpp && \
+        curl -fsSL https://codeload.github.com/googleapis/google-cloud-cpp/tar.gz/refs/tags/v2.24.0 | tar -xzf - --strip-components=1
+        cd ../
+    fi
+    cd google-cloud-cpp && cmake -S . -B cmake-out \
+        -DCMAKE_INSTALL_PREFIX="/usr/local" \
+        -DBUILD_SHARED_LIBS=ON \
+        -DBUILD_TESTING=OFF \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+        -DGOOGLE_CLOUD_CPP_ENABLE_EXAMPLES=OFF \
+        -DGOOGLE_CLOUD_CPP_ENABLE=bigtable,storage
+    cmake --build cmake-out -- -j $(nproc)
+    sudo cmake --build cmake-out --target install
+    cd ../ && rm -rf google-cloud-cpp
+
     # ------------- AWS SDK installation -------------
     log_info "Installing AWS SDK"
     cd $TEMP_DIR
